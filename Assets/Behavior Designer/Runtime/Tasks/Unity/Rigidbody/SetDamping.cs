@@ -1,39 +1,38 @@
-﻿using UnityEngine;
-using UnityEngine.AI;
+#if UNITY_6000_0_OR_NEWER
+using UnityEngine;
 
-namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityNavMeshAgent
+namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityRigidbody
 {
-    [TaskCategory("Unity/NavMeshAgent")]
-    [TaskDescription("Gets the velocity of the NavMeshAgent. Returns Success.")]
-    public class GetVelociuty : Action
+    [TaskCategory("Unity/Rigidbody")]
+    [TaskDescription("Sets the linear drag of the Rigidbody. Returns Success.")]
+    public class SetLinearDamping : Action
     {
         [Tooltip("The GameObject that the task operates on. If null the task GameObject is used.")]
         public SharedGameObject targetGameObject;
-        [SharedRequired]
-        [Tooltip("The velocity")]
-        public SharedVector3 storeValue;
+        [Tooltip("The linear drag of the Rigidbody")]
+        public SharedFloat linearDrag;
 
-        // cache the navmeshagent component
-        private NavMeshAgent navMeshAgent;
+        // cache the rigidbody component
+        private Rigidbody rigidbody;
         private GameObject prevGameObject;
 
         public override void OnStart()
         {
             var currentGameObject = GetDefaultGameObject(targetGameObject.Value);
             if (currentGameObject != prevGameObject) {
-                navMeshAgent = currentGameObject.GetComponent<NavMeshAgent>();
+                rigidbody = currentGameObject.GetComponent<Rigidbody>();
                 prevGameObject = currentGameObject;
             }
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (navMeshAgent == null) {
-                Debug.LogWarning("NavMeshAgent is null");
+            if (rigidbody == null) {
+                Debug.LogWarning("Rigidbody is null");
                 return TaskStatus.Failure;
             }
 
-            storeValue.Value = navMeshAgent.velocity;
+            rigidbody.linearDamping = linearDrag.Value;
 
             return TaskStatus.Success;
         }
@@ -41,7 +40,8 @@ namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityNavMeshAgent
         public override void OnReset()
         {
             targetGameObject = null;
-            storeValue = Vector3.zero;
+            linearDrag = 0;
         }
     }
 }
+#endif

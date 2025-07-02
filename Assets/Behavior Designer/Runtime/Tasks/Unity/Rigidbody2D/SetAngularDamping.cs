@@ -1,45 +1,45 @@
-#if UNITY_4_6 || UNITY_4_7
+#if UNITY_6000_0_OR_NEWER
 using UnityEngine;
 
-namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityLight
+namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityRigidbody2D
 {
-    [TaskCategory("Unity/Light")]
-    [TaskDescription("Sets the shadow softness fade value of the light.")]
-    public class SetShadowSoftnessFade : Action
+    [TaskCategory("Unity/Rigidbody2D")]
+    [TaskDescription("Sets the angular damping of the Rigidbody2D. Returns Success.")]
+    public class SetAngularDamping : Action
     {
         [Tooltip("The GameObject that the task operates on. If null the task GameObject is used.")]
         public SharedGameObject targetGameObject;
-        [Tooltip("The shadow softness fade to set")]
-        public SharedFloat shadowSoftnessFade;
+        [Tooltip("The angular damping of the Rigidbody2D")]
+        public SharedFloat angularDamping;
 
-        // cache the light component
-        private Light light;
+        private Rigidbody2D rigidbody2D;
         private GameObject prevGameObject;
 
         public override void OnStart()
         {
             var currentGameObject = GetDefaultGameObject(targetGameObject.Value);
             if (currentGameObject != prevGameObject) {
-                light = currentGameObject.GetComponent<Light>();
+                rigidbody2D = currentGameObject.GetComponent<Rigidbody2D>();
                 prevGameObject = currentGameObject;
             }
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (light == null) {
-                Debug.LogWarning("Light is null");
+            if (rigidbody2D == null) {
+                Debug.LogWarning("Rigidbody2D is null");
                 return TaskStatus.Failure;
             }
 
-            light.shadowSoftnessFade = shadowSoftnessFade.Value;
+            rigidbody2D.angularDamping = angularDamping.Value;
+
             return TaskStatus.Success;
         }
 
         public override void OnReset()
         {
             targetGameObject = null;
-            shadowSoftnessFade = 0;
+            angularDamping = 0;
         }
     }
 }

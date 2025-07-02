@@ -1,37 +1,38 @@
-#if UNITY_4_6 || UNITY_4_7
+#if UNITY_6000_0_OR_NEWER
 using UnityEngine;
 
-namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityAudioSource
+namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityRigidbody2D
 {
-    [TaskCategory("Unity/AudioSource")]
-    [TaskDescription("Sets the pan level value of the AudioSource. Returns Success.")]
-    public class SetPanLevel : Action
+    [TaskCategory("Unity/Rigidbody2D")]
+    [TaskDescription("Stores the linear damping of the Rigidbody2D. Returns Success.")]
+    public class GetLinearDamping : Action
     {
         [Tooltip("The GameObject that the task operates on. If null the task GameObject is used.")]
         public SharedGameObject targetGameObject;
-        [Tooltip("The pan level value of the AudioSource")]
-        public SharedFloat panLevel;
+        [Tooltip("The linear damping of the Rigidbody2D")]
+        [RequiredField]
+        public SharedFloat storeValue;
 
-        private AudioSource audioSource;
+        private Rigidbody2D rigidbody2D;
         private GameObject prevGameObject;
 
         public override void OnStart()
         {
             var currentGameObject = GetDefaultGameObject(targetGameObject.Value);
             if (currentGameObject != prevGameObject) {
-                audioSource = currentGameObject.GetComponent<AudioSource>();
+                rigidbody2D = currentGameObject.GetComponent<Rigidbody2D>();
                 prevGameObject = currentGameObject;
             }
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (audioSource == null) {
-                Debug.LogWarning("AudioSource is null");
+            if (rigidbody2D == null) {
+                Debug.LogWarning("Rigidbody2D is null");
                 return TaskStatus.Failure;
             }
 
-            audioSource.panLevel = panLevel.Value;
+            storeValue.Value = rigidbody2D.linearDamping;
 
             return TaskStatus.Success;
         }
@@ -39,7 +40,7 @@ namespace BehaviorDesigner.Runtime.Tasks.Unity.UnityAudioSource
         public override void OnReset()
         {
             targetGameObject = null;
-            panLevel = 1;
+            storeValue = 0;
         }
     }
 }
