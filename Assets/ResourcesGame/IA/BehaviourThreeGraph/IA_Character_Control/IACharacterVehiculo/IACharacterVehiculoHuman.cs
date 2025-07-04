@@ -68,9 +68,21 @@ public class IACharacterVehiculoHuman : IACharacterVehiculo
         Vector3 dir = (transform.position - AIEye.ViewEnemy.transform.position).normalized;
         TPAnimation.Mover(dir);
     }
-    public override void MoveToWander()
+     public override void MoveToWander()
     {
         base.MoveToWander();
+
+        // Verifica que TPAnimation no sea null
+        if (TPAnimation == null)
+        {
+            Debug.LogWarning("TPAnimation no está asignado en " + gameObject.name);
+            return;
+        }
+
+        // Si positionWander es un Vector3, esto no es necesario.
+        // Si es un Transform, verifica que no sea null:
+        // if (positionWander == null) { Debug.LogWarning("positionWander no está asignado"); return; }
+
         Vector3 dir = (positionWander - transform.position).normalized;
         TPAnimation.Mover(dir);
     }
